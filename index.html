@@ -1,1 +1,189 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лаба 7 (Style) - Кирило Безь</title>
+    <style>
+        :root {
+            --primary: #bb86fc;
+            --bg: #121212;
+            --surface: #1e1e1e;
+            --text: #e0e0e0;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 20px; text-align: center; }
+        h1 { color: var(--primary); margin-bottom: 30px; }
+        .section { background: var(--surface); border-radius: 10px; padding: 20px; margin-bottom: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        button { padding: 10px 20px; cursor: pointer; background: #2c2c2c; color: var(--text); border: 1px solid var(--primary); border-radius: 5px; font-weight: bold; transition: 0.3s; margin: 10px; }
+        button:hover { background: var(--primary); color: #000; }
 
+        /* ЗАВДАННЯ 1 */
+        #task1-box { 
+            width: 250px; 
+            height: 250px; 
+            background-color: red; 
+            border: 10px solid darkblue; 
+            margin: 0 auto 20px; 
+            transition: background-color 0.5s; 
+        }
+
+        /* ЗАВДАННЯ 2 */
+        .task2-wrapper { background-color: darkblue; padding: 30px; border-radius: 10px; }
+        table { margin: 0 auto; border-spacing: 20px; }
+        td { text-align: center; }
+        .img-frame { width: 200px; height: 200px; padding: 5px; object-fit: cover; }
+        #img1 { border: 50px outset #ffA089; }
+        #img2 { border: 50px outset #89ffA0; }
+
+        /* ЗАВДАННЯ 3 */
+        #t3-container {
+            width: 50vw; /* 50% ширини вікна */
+            height: 60vh;
+            margin: 0 auto;
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1000') center/cover no-repeat;
+            border: 2px solid #555;
+            overflow: hidden;
+        }
+        #t3-mover {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/e/e6/Ufo_icon.svg') center/contain no-repeat;
+            filter: drop-shadow(0 0 5px #0ff);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Лабораторна робота №7 (Об'єкт Style)</h1>
+
+    <!-- ЗАВДАННЯ 1 -->
+    <div class="section">
+        <h2>Завдання 1: Зміна кольору блоку</h2>
+        <div id="task1-box"></div>
+        <button id="task1-btn" onclick="toggleColor()">Змінити на блакитний</button>
+    </div>
+
+    <!-- ЗАВДАННЯ 2 -->
+    <div class="section task2-wrapper">
+        <h2 style="color: white;">Завдання 2: Приховування зображень (Display)</h2>
+        <table>
+            <tr>
+                <td><img id="img1" class="img-frame" src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?w=400"></td>
+                <td><img id="img2" class="img-frame" src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400"></td>
+            </tr>
+            <tr>
+                <td><button id="btn1" onclick="toggleImage(1)">Сховай мене</button></td>
+                <td><button id="btn2" onclick="toggleImage(2)">Сховай мене</button></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- ЗАВДАННЯ 3 -->
+    <div class="section">
+        <h2>Завдання 3: Рух об'єкта "змійкою"</h2>
+        <div id="t3-container">
+            <div id="t3-mover"></div>
+        </div>
+        <button onclick="startAnimation()">Запустити рух</button>
+    </div>
+
+    <script>
+        // --- ЗАВДАННЯ 1 ---
+        let isRed = true;
+        const toggleColor = () => {
+            const box = document.getElementById("task1-box");
+            const btn = document.getElementById("task1-btn");
+            if (isRed) {
+                box.style.backgroundColor = "lightblue";
+                btn.textContent = "Змінити на червоний";
+            } else {
+                box.style.backgroundColor = "red";
+                btn.textContent = "Змінити на блакитний";
+            }
+            isRed = !isRed;
+        };
+
+        // --- ЗАВДАННЯ 2 ---
+        const toggleImage = (num) => {
+            const img = document.getElementById(`img${num}`);
+            const btn = document.getElementById(`btn${num}`);
+            
+            // Використання властивості display
+            if (img.style.display === "none") {
+                img.style.display = "block";
+                btn.textContent = "Сховай мене";
+            } else {
+                img.style.display = "none";
+                btn.textContent = "Покажи мене";
+            }
+        };
+
+        // --- ЗАВДАННЯ 3 ---
+        let animInterval;
+        const startAnimation = () => {
+            clearInterval(animInterval); // Зупинити попередню анімацію, якщо є
+            
+            const mover = document.getElementById("t3-mover");
+            const container = document.getElementById("t3-container");
+            
+            let posX = 0;
+            let posY = 0;
+            const step = 3; // швидкість руху
+            const moverSize = 50; // ширина/висота об'єкта
+            
+            // Напрямки: 'down', 'right-bottom', 'up', 'right-top'
+            let direction = 'down'; 
+            let targetX = 0;
+
+            animInterval = setInterval(() => {
+                const maxX = container.clientWidth - moverSize;
+                const maxY = container.clientHeight - moverSize;
+
+                if (posX >= maxX) {
+                    clearInterval(animInterval); // Кінець шляху (права межа)
+                    return;
+                }
+
+                if (direction === 'down') {
+                    posY += step;
+                    if (posY >= maxY) {
+                        posY = maxY;
+                        direction = 'right-bottom';
+                        targetX = posX + moverSize; // ціль для руху вправо
+                    }
+                } 
+                else if (direction === 'right-bottom') {
+                    posX += step;
+                    if (posX >= targetX) {
+                        posX = targetX;
+                        direction = 'up';
+                    }
+                }
+                else if (direction === 'up') {
+                    posY -= step;
+                    if (posY <= 0) {
+                        posY = 0;
+                        direction = 'right-top';
+                        targetX = posX + moverSize; // ціль для руху вправо
+                    }
+                }
+                else if (direction === 'right-top') {
+                    posX += step;
+                    if (posX >= targetX) {
+                        posX = targetX;
+                        direction = 'down';
+                    }
+                }
+
+                mover.style.left = posX + "px";
+                mover.style.top = posY + "px";
+            }, 20); // частота оновлення (20мс)
+        };
+    </script>
+
+</body>
+</html>
